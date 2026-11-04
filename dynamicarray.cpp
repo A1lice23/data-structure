@@ -18,6 +18,7 @@ class DynamicArray {
         T init_value = T{};
 
     public:
+        // 생성자, 소멸자, operator= 
         DynamicArray(std::size_t initial_size){
             _size = initial_size;
             _capacity = initial_size;
@@ -36,6 +37,8 @@ class DynamicArray {
                 Traits::deallocate(_alloc, _data, _capacity);
             }
         }
+
+        // Capacity: size, max_size, resize, capacity, empty, reserve, shrink_to_fit
 
         std::size_t size() {
             return _size;
@@ -78,6 +81,8 @@ class DynamicArray {
             _capacity = new_capacity;
         }
 
+        // Element access: operator[], at, front, back, data
+
         T& at(std::size_t index){
             return _data[index];
         }
@@ -93,6 +98,8 @@ class DynamicArray {
         T& back(){
             return _data[_size - 1];
         }
+
+        // Modifiers: assign, push_back, pop_back, insert, erase, swap, clear, emplace, emplace_back
 
         void push_back(T item){
             if(_size >= _capacity){
@@ -112,9 +119,8 @@ class DynamicArray {
     
 };
 
-int main() {
-    
-    
-    
-    return 0;
-}
+// new 대신 allocate를 사용한 이유 : 메모리 공간 확보와 객체 생성을 따로 조절해서 사용해야 하기 때문
+// 새로운 메모리 할당 공간으로 기존 객체들을 옮길 때 복사나 이동을 사용. 복사하면 이동보다 비효율적일 때가 있고, 
+// 복사 생성 중 예외 발생 시 기존 복사한 객체들의 소멸자가 호출되지 않아 할당된 메모리가 해제되지 않을 위험이 존재
+// std::move()로 이동가능, int와 같이 소유한 자원이 없는 타입은 이동이나 복사나 같은 효과
+// std::move_if_noexcept()와 같은 함수가 존재해서 상황에 따라 복사나 이동을 선택할 수 있음
