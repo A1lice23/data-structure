@@ -7,13 +7,14 @@
 
 class DynamicArray {
     private:
-        int* data;
+        int* data = nullptr;
         int _size;
         int _capacity;
 
     public:
         DynamicArray(int initial_size){
             _size = initial_size;
+            _capacity = initial_size;
             data = new int[_size]; 
         }
 
@@ -34,7 +35,11 @@ class DynamicArray {
         }
 
         int& at(int index){
-            
+            return data[index];
+        }
+
+        int& operator[](int index){
+            return data[index];
         }
 
 
