@@ -42,7 +42,24 @@ class DynamicArray {
             return data[index];
         }
 
+        int& front(){
+            return data[0];
+        }
 
+        int& back(){
+            return data[_size - 1];
+        }
+
+        void push_back(int item){
+            if(++_size >= _capacity){
+                //capacity 늘리기
+            }
+            data[_size - 1] = item; 
+        }
+
+        void pop_back(){
+            _size--;
+        }
 
 
 
