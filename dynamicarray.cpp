@@ -4,61 +4,75 @@
 //push_back, pop_back, size, capacity, reserve, resize 구현 해보기
 
 #include <iostream>
+#include <memory>
 
+template <typename T, typename Alloc = std::allocator<T>>
 class DynamicArray {
     private:
-        int* data = nullptr;
-        int _size;
-        int _capacity;
+        using Traits = std::allocator_traits<Alloc>;
+        Alloc _alloc;
+
+        T* _data = nullptr;
+        std::size_t _size;
+        std::size_t _capacity;
 
     public:
-        DynamicArray(int initial_size){
-            _size = initial_size;
-            _capacity = initial_size;
-            data = new int[_size]; 
+        DynamicArray(std::size_t initial_size){
+            if(initial_size >= 0){
+                _size = initial_size;
+                _capacity = initial_size;
+                _data = _alloc.allocate(_capacity); 
+            }
         }
 
         ~DynamicArray() {
-            delete[] data;
+            for(std::size_t i = 0; i < _size; i++){
+                Traits::destroy(_alloc, _data + i);
+            }
+            if(_data != nullptr){
+                _alloc.deallocate(_data, _capacity);
+            }
         }
 
-        int size() {
+        std::size_t size() {
             return _size;
         }
 
-        int capacity(){
+        std::size_t capacity(){
             return _capacity;
         }
 
         bool empty(){
-            return true;
+            return _data == nullptr;
         }
 
-        int& at(int index){
-            return data[index];
+        T& at(std::size_t index){
+            return _data[index];
         }
 
-        int& operator[](int index){
-            return data[index];
+        T& operator[](std::size_t index){
+            return _data[index];
         }
 
-        int& front(){
-            return data[0];
+        T& front(){
+            return _data[0];
         }
 
-        int& back(){
-            return data[_size - 1];
+        T& back(){
+            return _data[_size - 1];
         }
 
-        void push_back(int item){
-            if(++_size >= _capacity){
-                //capacity 늘리기
+        void push_back(T item){
+            if(_size >= _capacity){
+                // 용량 늘리기
             }
-            data[_size - 1] = item; 
+            Traits::construct(_alloc, _data + _size++, item);
         }
 
         void pop_back(){
-            _size--;
+            if(_size > 0){
+                Traits::destory(_alloc, _data + --_size);
+            }
         }
 
 
