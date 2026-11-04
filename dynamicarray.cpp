@@ -15,13 +15,16 @@ class DynamicArray {
         T* _data = nullptr;
         std::size_t _size;
         std::size_t _capacity;
+        T init_value = T{};
 
     public:
         DynamicArray(std::size_t initial_size){
-            if(initial_size >= 0){
-                _size = initial_size;
-                _capacity = initial_size;
-                _data = _alloc.allocate(_capacity); 
+            _size = initial_size;
+            _capacity = initial_size;
+            _data = Traits::allocate(_alloc, _capacity);
+
+            for(std::size_t i = 0; i < _size; i++){
+                Traits::construct(_alloc, _data + i, init_value);
             }
         }
 
@@ -30,7 +33,7 @@ class DynamicArray {
                 Traits::destroy(_alloc, _data + i);
             }
             if(_data != nullptr){
-                _alloc.deallocate(_data, _capacity);
+                Traits::deallocate(_alloc, _data, _capacity);
             }
         }
 
@@ -38,12 +41,41 @@ class DynamicArray {
             return _size;
         }
 
+        void resize(std::size_t new_size){
+            
+        }
+
         std::size_t capacity(){
             return _capacity;
         }
 
         bool empty(){
-            return _data == nullptr;
+            return _size == 0;
+        }
+
+        void reserve(std::size_t new_capacity){
+            if(_capacity >= new_capacity){
+                return;
+            }
+            
+            // size만큼 기본 애들은 새로 할당한 곳에 이동
+            // 기존 data들 제거 및 할당한 것 풀기
+
+            T* new_data = Traits::allocate(_alloc, new_capacity);
+
+            for(std::size_t i = 0; i < _size; i++){
+                Traits::construct(_alloc, new_data + i, _data[i]);
+            }
+
+            for(std::size_t i = 0; i < _size; i++){
+                Traits::destroy(_alloc, _data + i);
+            }
+            if(_data != nullptr){
+                Traits::deallocate(_alloc, _data, _capacity);
+            }
+
+            _data = new_data;
+            _capacity = new_capacity;
         }
 
         T& at(std::size_t index){
@@ -71,7 +103,7 @@ class DynamicArray {
 
         void pop_back(){
             if(_size > 0){
-                Traits::destory(_alloc, _data + --_size);
+                Traits::destroy(_alloc, _data + --_size);
             }
         }
 
