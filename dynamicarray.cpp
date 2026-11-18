@@ -18,7 +18,7 @@ class DynamicArray {
         T init_value = T{};
 
     public:
-        // 생성자, 소멸자, operator= 
+        // 생성자, 소멸자
         DynamicArray(std::size_t initial_size){
             _size = initial_size;
             _capacity = initial_size;
@@ -45,6 +45,21 @@ class DynamicArray {
         }
 
         void resize(std::size_t new_size){
+            if(new_size > _capacity){
+                reserve(new_size);
+            }
+            if(new_size > _size){
+                for(std::size_t i = _size; i  < new_size; i++){
+                    Traits::construct(_alloc, _data + i, init_value);
+                }
+
+            }
+            else{
+                for(std::size_t i = new_size; i< _size; i++){
+                    Traits::destroy(_alloc, _data + i);
+                }
+            }
+            _size = new_size;
             
         }
 
@@ -73,6 +88,7 @@ class DynamicArray {
             for(std::size_t i = 0; i < _size; i++){
                 Traits::destroy(_alloc, _data + i);
             }
+
             if(_data != nullptr){
                 Traits::deallocate(_alloc, _data, _capacity);
             }
@@ -100,6 +116,36 @@ class DynamicArray {
         }
 
         // Modifiers: assign, push_back, pop_back, insert, erase, swap, clear, emplace, emplace_back
+        
+        void assign(std::size_t n, const T& val){
+            if(n > _capacity){
+
+                T* new_data = Traits::allocate(_alloc, n);
+
+                for(std::size_t i = 0; i < n; i++){
+                    Traits::construct(_alloc, new_data + i, val);
+                }
+
+                for(std::size_t i = 0; i < _size; i++){
+                    Traits::destroy(_alloc, _data + i);
+                }
+                
+                if(_data != nullptr){
+                    Traits::deallocate(_alloc, _data, _capacity);
+                }
+                
+                _data = new_data;
+                _capacity = n;
+
+            }
+            else{
+                for(std::size_t i = 0; i < n; i++){
+                    _data[i] = val;
+                }
+            }
+            
+            _size = n;
+        }
 
         void push_back(T item){
             if(_size >= _capacity){
